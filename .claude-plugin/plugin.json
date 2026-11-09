@@ -1,0 +1,13 @@
+{
+  "name": "tmux-claude-sessions",
+  "version": "0.1.0",
+  "description": "Writes the state of each Claude Code session (working, needs input, idle) to its tmux pane, for the tmux-claude-sessions sidebar.",
+  "author": {
+    "name": "Bertil Nguyen",
+    "url": "https://github.com/nguyenbertil"
+  },
+  "homepage": "https://github.com/nguyenbertil/tmux-claude-sessions",
+  "repository": "https://github.com/nguyenbertil/tmux-claude-sessions",
+  "license": "MIT",
+  "keywords": ["tmux", "sessions", "hooks"]
+}

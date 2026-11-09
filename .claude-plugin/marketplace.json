@@ -1,0 +1,18 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "tmux-claude-sessions",
+  "description": "A tmux sidebar that lists your Claude Code sessions and their state.",
+  "owner": {
+    "name": "Bertil Nguyen",
+    "url": "https://github.com/nguyenbertil"
+  },
+  "plugins": [
+    {
+      "name": "tmux-claude-sessions",
+      "description": "Writes the state of each Claude Code session to its tmux pane, for the tmux-claude-sessions sidebar.",
+      "source": "./",
+      "category": "productivity",
+      "keywords": ["tmux", "sessions", "hooks"]
+    }
+  ]
+}

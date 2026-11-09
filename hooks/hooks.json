@@ -1,0 +1,26 @@
+{
+  "description": "Writes the state of each Claude session to its tmux pane, for the tmux-claude-sessions sidebar",
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/set-state.sh\" idle" }] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/set-state.sh\" working" }] }
+    ],
+    "PreToolUse": [
+      { "hooks": [{ "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/set-state.sh\" working" }] }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt|elicitation_dialog",
+        "hooks": [{ "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/set-state.sh\" needs-input" }]
+      }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/set-state.sh\" idle" }] }
+    ],
+    "SessionEnd": [
+      { "hooks": [{ "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/set-state.sh\" end" }] }
+    ]
+  }
+}
