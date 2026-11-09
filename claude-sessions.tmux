@@ -4,8 +4,11 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPTS="$DIR/scripts"
 
 key=$(tmux show-option -gqv @claude-sessions-key)
-tmux bind-key "${key:-C-c}" run-shell "'$SCRIPTS/toggle.sh' '#{pane_id}'"
+tmux bind-key "${key:-C-c}" run-shell "'$SCRIPTS/toggle.sh' '#{client_tty}'"
+focus_key=$(tmux show-option -gqv @claude-sessions-focus-key)
+tmux bind-key "${focus_key:-C-f}" run-shell "'$SCRIPTS/toggle.sh' focus '#{client_tty}'"
 
 # A fixed array index, so a config reload replaces the hook and keeps hooks from other plugins.
-tmux set-hook -g 'session-window-changed[87]' "run-shell \"'$SCRIPTS/follow.sh' '#{window_id}'\""
-tmux set-hook -g 'client-session-changed[87]' "run-shell \"'$SCRIPTS/follow.sh' '#{window_id}'\""
+tmux set-hook -g 'session-window-changed[87]' "run-shell \"'$SCRIPTS/sync.sh'\""
+tmux set-hook -g 'client-session-changed[87]' "run-shell \"'$SCRIPTS/sync.sh'\""
+tmux set-hook -g 'client-detached[87]' "run-shell \"'$SCRIPTS/sync.sh' '#{client_tty}'\""

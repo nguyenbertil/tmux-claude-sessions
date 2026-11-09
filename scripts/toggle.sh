@@ -1,31 +1,38 @@
 #!/usr/bin/env bash
-# Usage: toggle.sh <pane-id>
-#        toggle.sh close
+# Usage: toggle.sh <client-tty>        turn the sidebar on or off for this client (terminal)
+#        toggle.sh focus <client-tty>  turn the sidebar on for this client and move focus to it
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$DIR/helpers.sh"
 
-close_sidebar() {
-	local window
-	window=$(tmux display-message -p -t "$1" '#{window_id}')
-	tmux kill-pane -t "$1"
-	restore_widths "$window"
-}
+mode=toggle
+focus=$(get_option @claude-sessions-focus on)
+if [ "$1" = focus ]; then
+	mode=focus
+	focus=on
+	shift
+fi
+client="${1:-$(tmux display-message -p '#{client_tty}')}"
 
-open_sidebar() {
-	local window pane focus_flag
-	window=$(tmux display-message -p -t "$1" '#{window_id}')
-	save_widths "$window"
-	focus_flag=""
-	[ "$(get_option @claude-sessions-focus on)" = on ] || focus_flag="-d"
-	pane=$(tmux split-window $focus_flag -f -h -l "$(sidebar_width)" -t "$(top_right_pane "$window")" \
-		-P -F '#{pane_id}' "'$DIR/sidebar.sh'")
-	tmux set-option -p -t "$pane" @claude_sessions_sidebar 1
-}
+on=" $(tmux show-option -gqv @claude_sessions_clients) "
+case "$on" in
+*" $client "*)
+	if [ "$mode" = toggle ]; then
+		tmux set-option -g @claude_sessions_clients "${on/ $client / }"
+		exec "$DIR/sync.sh"
+	fi
+	;;
+*)
+	tmux set-option -g @claude_sessions_clients "$on$client "
+	;;
+esac
 
-sidebar=$(sidebar_pane)
-if [ -n "$sidebar" ]; then
-	close_sidebar "$sidebar"
-elif [ "$1" != close ]; then
-	open_sidebar "${1:-$(tmux display-message -p '#{pane_id}')}"
+"$DIR/sync.sh"
+
+if [ "$focus" = on ]; then
+	# Not display-message -c: it reads the formats of the most recent client, not of this one.
+	window=$(tmux list-clients -F '#{client_tty} #{window_id}' | awk -v c="$client" '$1 == c { print $2 }')
+	sidebar=$(tmux list-panes -t "$window" -F '#{@claude_sessions_sidebar} #{pane_id}' |
+		awk '$1 == "1" { print $2; exit }')
+	[ -z "$sidebar" ] || tmux select-pane -t "$sidebar"
 fi

@@ -10,11 +10,6 @@ sidebar_width() {
 	get_option @claude-sessions-width 32
 }
 
-sidebar_pane() {
-	tmux list-panes -a -F '#{pane_id} #{@claude_sessions_sidebar}' |
-		awk '$2 == "1" { print $1; exit }'
-}
-
 save_widths() {
 	tmux set-option -w -t "$1" @claude_sessions_widths \
 		"$(tmux list-panes -t "$1" -F '#{pane_id}:#{pane_width}' | tr '\n' ' ')"
