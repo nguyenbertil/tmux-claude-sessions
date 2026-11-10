@@ -15,7 +15,7 @@ printf '\e[?25l'
 
 render() {
 	local cols rows text_width i line row index gutter start end
-	local pane state title location head
+	local pane state title location head active
 	local -a out owner
 
 	cols=$(tput cols)
@@ -50,6 +50,10 @@ render() {
 		printf '\e[H\e[2J\e[2mNo Claude sessions\e[0m'
 		return
 	fi
+
+	# Follow the pane the user works in. While the sidebar itself has focus, j/k own the cursor.
+	active=$(tmux list-panes -t "$TMUX_PANE" -f '#{pane_active}' -F '#{pane_id}')
+	case " ${panes[*]} " in *" $active "*) selected=$active ;; esac
 
 	for i in "${!panes[@]}"; do
 		if [ "${panes[$i]}" = "$selected" ]; then
