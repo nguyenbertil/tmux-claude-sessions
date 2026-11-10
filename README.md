@@ -79,6 +79,7 @@ Sessions that run while you install the plugin show up in the sidebar after thei
 | `prefix + C-f` | anywhere | Move focus to the sidebar, and turn it on first when it is off |
 | `j` / `k` (or `↓` / `↑`) | sidebar | Move to the next or previous session |
 | `Enter` | sidebar | Jump to the selected session |
+| `x`, then `y` | sidebar | Close the selected session: kill its pane. Any other key after `x` cancels. If only the sidebar would stay in the window, the window closes |
 
 To leave the sidebar without a jump, use your usual keys that move between panes.
 
@@ -92,6 +93,7 @@ Set these in `~/.tmux.conf` before the plugin loads:
 | `@claude-sessions-focus-key` | `C-f` | The key, after the prefix, that moves focus to the sidebar and opens it when it is closed |
 | `@claude-sessions-width` | `32` | The width of the sidebar, in columns |
 | `@claude-sessions-focus` | `on` | `off` keeps the focus on your pane when the toggle key opens the sidebar |
+| `@claude-sessions-close-key` | `x` | The key, in the sidebar, that closes the selected session. Use one character |
 
 ## Limits
 

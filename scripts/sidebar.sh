@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "$DIR/helpers.sh"
+
+close_key=$(get_option @claude-sessions-close-key x)
+close_key=${close_key:0:1}
 
 selected=""
+confirm=""
 cursor=0
 offset=0
 panes=()
@@ -33,6 +38,7 @@ render() {
 		idle) head=$'\e[32m● idle\e[0m' ;;
 		*) head=$'\e[2m◌ working\e[0m' ;;
 		esac
+		[ "$pane" != "$confirm" ] || head=$'\e[1;33m✕ close? y/n\e[0m'
 		out+=("$head")
 		owner+=("$i")
 		while IFS= read -r line; do
@@ -47,6 +53,7 @@ render() {
 
 	if [ ${#panes[@]} -eq 0 ]; then
 		selected=""
+		confirm=""
 		printf '\e[H\e[2J\e[2mNo Claude sessions\e[0m'
 		return
 	fi
@@ -63,6 +70,7 @@ render() {
 	done
 	[ "$cursor" -lt ${#panes[@]} ] || cursor=$((${#panes[@]} - 1))
 	selected=${panes[$cursor]}
+	[ "$confirm" = "$selected" ] || confirm=""
 
 	start=-1
 	end=-1
@@ -100,7 +108,13 @@ move() {
 while true; do
 	render
 	if IFS= read -rsn1 -t 1 key; then
+		if [ -n "$confirm" ]; then
+			[ "$key" != y ] || "$DIR/close.sh" "$confirm"
+			confirm=""
+			continue
+		fi
 		case "$key" in
+		"$close_key") [ -z "$selected" ] || confirm=$selected ;;
 		j) move 1 ;;
 		k) move -1 ;;
 		"") [ -z "$selected" ] || "$DIR/jump.sh" "$selected" ;;
